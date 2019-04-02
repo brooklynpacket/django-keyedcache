@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import types
 
 def is_string_like(maybe):
@@ -11,4 +12,4 @@ def is_string_like(maybe):
 
 
 def is_list_or_tuple(maybe):
-    return isinstance(maybe, (types.TupleType, types.ListType))
+    return isinstance(maybe, (tuple, list))
