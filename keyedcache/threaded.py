@@ -6,6 +6,7 @@ To enable, add this to some models.py file in an app::
     threaded.start_listening()
 
 """
+from __future__ import unicode_literals
 from threaded_multihost import threadlocals
 from django.core.signals import request_started, request_finished
 from keyedcache import cache_clear_request, cache_use_request_caching

@@ -14,6 +14,7 @@ Example:
 
 More info below about parameters.
 """
+from __future__ import unicode_literals
 # For keyedcache developers:
 # No additional keyword parameters should be added to the definition of
 # cache_set, cache_get, cache_delete or cache_key in the future.
@@ -23,6 +24,8 @@ More info below about parameters.
 # will be used as keys and cache_set/cache_get will use different keys that
 # would cause serious problems.)
 
+from builtins import str
+from builtins import object
 from django.conf import settings
 from django.core.cache import caches, InvalidCacheBackendError, DEFAULT_CACHE_ALIAS
 from django.core.exceptions import ImproperlyConfigured
@@ -30,7 +33,8 @@ from django.utils.encoding import smart_str
 from hashlib import md5
 from keyedcache.utils import is_string_like, is_list_or_tuple
 from warnings import warn
-import cPickle as pickle
+import six
+from six.moves import cPickle as pickle
 import logging
 import types
 
@@ -147,7 +151,7 @@ def cache_delete(*keys, **kwargs):
         if (keys or kwargs):
             key = cache_key(*keys, **kwargs)
 
-            if CACHED_KEYS.has_key(key):
+            if key in CACHED_KEYS:
                 del CACHED_KEYS[key]
                 removed.append(key)
 
@@ -155,7 +159,7 @@ def cache_delete(*keys, **kwargs):
 
             if children:
                 key = key + KEY_DELIM
-                children = [x for x in CACHED_KEYS.keys() if x.startswith(key)]
+                children = [x for x in list(CACHED_KEYS.keys()) if x.startswith(key)]
                 for k in children:
                     del CACHED_KEYS[k]
                     cache.delete(k)
@@ -164,7 +168,7 @@ def cache_delete(*keys, **kwargs):
             key = "All Keys"
             deleteneeded = _cache_flush_all()
 
-            removed = CACHED_KEYS.keys()
+            removed = list(CACHED_KEYS.keys())
 
             if deleteneeded:
                 for k in CACHED_KEYS:
@@ -224,7 +228,7 @@ def cache_function(length=CACHE_TIMEOUT):
                 try:
                     value = cache_get('func', func.__name__, func.__module__, args, kwargs)
 
-                except NotCachedError, e:
+                except NotCachedError as e:
                     # This will set a temporary value while ``func`` is being
                     # processed. When using threads, this is vital, as otherwise
                     # the function can be called several times before it finishes
@@ -234,7 +238,7 @@ def cache_function(length=CACHE_TIMEOUT):
                     value = func(*args, **kwargs)
                     cache_set(e.key, value=value, length=length)
 
-                except MethodNotFinishedError, e:
+                except MethodNotFinishedError as e:
                     value = func(*args, **kwargs)
 
             return value
@@ -254,7 +258,7 @@ def cache_get(*keys, **kwargs):
         other kwargs:
             Unknown key=val is interpreted like two aditional keys: (key, val)
     """
-    if kwargs.has_key('default'):
+    if 'default' in kwargs:
         default_value = kwargs.pop('default')
         use_default = True
     else:
@@ -335,7 +339,7 @@ def cache_set(*keys, **kwargs):
             cache_set_request(key, val)
 
 def _hash_or_string(key):
-    if is_string_like(key) or isinstance(key, (types.IntType, types.LongType, types.FloatType)):
+    if is_string_like(key) or isinstance(key, (int, float)):
         return smart_str(key)
     else:
         try:
