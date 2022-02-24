@@ -31,6 +31,6 @@ setup(
                    'Programming Language :: Python :: 2.7',
                    'Framework :: Django'],
     packages = find_packages(),
-    install_requires = ['django'],  # >=1.4 <1.6
+    install_requires = ['django>=3'],
     include_package_data = True,
 )

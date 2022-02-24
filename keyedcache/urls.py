@@ -2,12 +2,12 @@
 URLConf for Caching app
 """
 from __future__ import unicode_literals
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.stats_page, {}, 'keyedcache_stats'),
-    url(r'^view/$', views.view_page, {}, 'keyedcache_view'),
-    url(r'^delete/$', views.delete_page, {}, 'keyedcache_delete'),
+    path('', views.stats_page, {}, 'keyedcache_stats'),
+    path('view/', views.view_page, {}, 'keyedcache_view'),
+    path('delete/', views.delete_page, {}, 'keyedcache_delete'),
 ]
